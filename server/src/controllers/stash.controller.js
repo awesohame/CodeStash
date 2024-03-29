@@ -74,7 +74,23 @@ const getStashByUsername = asyncHandler(async (req, res) => {
         throw new ApiError(404, "No such user found");
     }
 
-    const stashes = await Stash.find({ author: user._id }).populate("author", "-password -refreshToken");
+    // const stashes = await Stash.find({ author: user._id }).populate("author", "-password -refreshToken");
+    const stashes = await Stash.aggregate([
+        {
+            $match: {
+                author: mongoose.Types.ObjectId(user._id),
+                visibility: "public"
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "author"
+            }
+        }
+    ]);
 
     if (!stashes) {
         throw new ApiError(404, "No stashes found");
@@ -84,7 +100,37 @@ const getStashByUsername = asyncHandler(async (req, res) => {
 
 });
 
-// get stash by id
+// get stashes sorted by date using aggregation pipelines
+const getStashesSortedByDate = asyncHandler(async (req, res) => {
+    const lim = parseInt(req.body.limit) || 10;
+    // const userIdToExclude = req.user._id;
+    const stashes = await Stash.aggregate([
+        {
+            $sort: {
+                createdAt: -1
+            }
+        },
+        {
+            $limit: lim
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "author"
+            }
+        }
+    ]);
+
+
+
+    if (!stashes) {
+        throw new ApiError(404, "No stashes found");
+    }
+
+    return res.status(200).json(new ApiResponse(200, stashes, "Stashes found"));
+});
 
 
 
@@ -93,4 +139,5 @@ export {
     getPublicStashes,
     getStashesOfCurrentUser,
     getStashByUsername,
+    getStashesSortedByDate
 }
