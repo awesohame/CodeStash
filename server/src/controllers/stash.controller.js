@@ -132,6 +132,38 @@ const getStashesSortedByDate = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, stashes, "Stashes found"));
 });
 
+const updateStash = asyncHandler(async (req, res) => {
+    const { title, description, content, visibility, publiclyEditable } = req.body;
+
+    if (title === "" && content === "" && description === "" && visibility === "" && publiclyEditable === "") {
+        throw new ApiError(400, "All fields are empty");
+    }
+    const stash = await Stash.findById(req.params.id);
+
+    stash.title = title ? title : stash.title;
+    stash.description = description ? description : stash.description;
+    stash.content = content ? content : stash.content;
+    stash.visibility = visibility ? visibility : stash.visibility;
+    stash.publiclyEditable = publiclyEditable ? publiclyEditable : stash.publiclyEditable;
+
+    await stash.save();
+
+    if (!stash) {
+        throw new ApiError(500, "Failed to update stash");
+    }
+
+    return res.status(200).json(new ApiResponse(200, stash, "Stash updated successfully"));
+});
+
+const deleteStash = asyncHandler(async (req, res) => {
+    try {
+        await Stash.findByIdAndDelete(req.params.id);
+    } catch (error) {
+        throw new ApiError(500, "Failed to delete stash");
+    }
+
+    return res.status(200).json(new ApiResponse(200, {}, "Stash deleted successfully"));
+});
 
 
 export {
@@ -139,5 +171,7 @@ export {
     getPublicStashes,
     getStashesOfCurrentUser,
     getStashByUsername,
-    getStashesSortedByDate
+    getStashesSortedByDate,
+    updateStash,
+    deleteStash
 }
