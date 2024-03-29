@@ -106,7 +106,13 @@ const loginUser = asyncHandler(async (req, res) => {
 })
 
 const logoutUser = asyncHandler(async (req, res) => {
-    User.findByIdAndUpdate(req.user._id,
+    const user = req.user;
+
+    if (!user) {
+        throw new ApiError(401, "Invalid Access Token")
+    }
+
+    User.findByIdAndUpdate(user._id,
         {
             $unset: {
                 refreshToken: 1
@@ -130,10 +136,10 @@ const logoutUser = asyncHandler(async (req, res) => {
 })
 
 const deleteUser = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id);
+    const user = req.user;
 
     if (!user) {
-        throw new ApiError(404, "User not found");
+        throw new ApiError(401, "Invalid Access Token")
     }
 
     await User.findByIdAndDelete(req.user._id);
@@ -198,6 +204,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const getCurrentUser = asyncHandler(async (req, res) => {
     const user = req.user;
+
+    if (!user) {
+        throw new ApiError(401, "Invalid Access Token")
+    }
 
     return res
         .status(200)

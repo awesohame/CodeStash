@@ -19,7 +19,6 @@ const stashSchema = new Schema(
         author: {
             type: Schema.Types.ObjectId,
             ref: "User",
-            required: true,
             default: null,
         },
         visibility: {
@@ -27,6 +26,11 @@ const stashSchema = new Schema(
             required: true,
             default: "public",
             enum: ["public", "private"],
+        },
+        publiclyEditable: {
+            type: Boolean,
+            required: true,
+            default: false,
         },
     },
     { timestamps: true }
