@@ -24,7 +24,7 @@ const generateAccessAndRefreshToken = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
-    console.log('username:', username, 'password:', password);
+    // console.log('username:', username, 'password:', password);
 
     if (
         [username, password].some((field) => field?.trim() === "")
@@ -45,6 +45,8 @@ const registerUser = asyncHandler(async (req, res) => {
         password,
     });
 
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
+
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     )
@@ -53,7 +55,16 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Failed to create user");
     }
 
-    return res.status(201).json(new ApiResponse(200, createdUser, "User Registered Successfully"))
+    const options = {
+        httpOnly: true,
+        secure: true
+    };
+
+    return res
+        .status(201)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(new ApiResponse(200, createdUser, "User Registered Successfully"))
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -156,6 +167,67 @@ const deleteUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "User deleted successfully"));
 });
 
+const changePassword = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+        throw new ApiError(401, "Invalid Access Token")
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+        throw new ApiError(400, "Current and new password are required");
+    }
+
+    const isPasswordValid = await user.verifyPassword(currentPassword);
+
+    if (!isPasswordValid) {
+        throw new ApiError(400, "Invalid current password");
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    const loggedInUser = await User.findById(user._id).select(
+        "-password -refreshToken"
+    );
+
+    if (!loggedInUser) {
+        throw new ApiError(500, "Failed to change password");
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, loggedInUser, "Password changed successfully"));
+});
+
+const changeUsername = asyncHandler(async (req, res) => {
+    const user = req.user;
+
+    if (!user) {
+        throw new ApiError(401, "Invalid Access Token")
+    }
+
+    const { newUsername } = req.body;
+
+    if (!newUsername) {
+        throw new ApiError(400, "New username is required");
+    }
+
+    const existingUsername = await User.findOne({ username: newUsername });
+    if (existingUsername) {
+        throw new ApiError(400, "Username already exists");
+    }
+
+    user.username = newUsername;
+    await user.save();
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user, "Username changed successfully"));
+});
+
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
@@ -220,5 +292,8 @@ export {
     logoutUser,
     deleteUser,
     refreshAccessToken,
-    getCurrentUser
+    getCurrentUser,
+    changePassword,
+    changeUsername,
+
 };
