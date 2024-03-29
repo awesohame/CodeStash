@@ -22,6 +22,12 @@ const stashSchema = new Schema(
             required: true,
             default: null,
         },
+        visibility: {
+            type: String,
+            required: true,
+            default: "public",
+            enum: ["public", "private"],
+        },
     },
     { timestamps: true }
 )

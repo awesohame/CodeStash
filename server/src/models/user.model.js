@@ -16,14 +16,6 @@ const userSchema = new Schema(
             type: String,
             required: true,
         },
-        email: {
-            type: String,
-            required: true,
-            unique: true,
-            trim: true,
-            index: true,
-            lowercase: true,
-        },
         refreshToken: {
             type: String,
         },
@@ -44,29 +36,28 @@ userSchema.methods.verifyPassword = async function (password) {
 };
 
 userSchema.methods.generateAccessToken = function () {
-    jwt.sign(
+    return jwt.sign(
         {
             _id: this._id,
             username: this.username,
-            email: this.email,
-        }
-    ),
+        },
         process.env.ACCESS_TOKEN_SECRET,
-    {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRY
-    }
-};
-
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+        }
+    )
+}
 userSchema.methods.generateRefreshToken = function () {
-    jwt.sign(
+    return jwt.sign(
         {
             _id: this._id,
-        }
-    ),
+
+        },
         process.env.REFRESH_TOKEN_SECRET,
-    {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRY
-    }
-};
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
+    )
+}
 
 export const User = mongoose.model('User', userSchema);
