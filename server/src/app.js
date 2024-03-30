@@ -17,9 +17,11 @@ app.use(cookieParser());
 //routes import
 import userRouter from './routes/user.routes.js';
 import stashRouter from './routes/stash.routes.js';
+import collectionRouter from './routes/collection.routes.js';
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/stashes", stashRouter);
+app.use("/api/v1/collections", collectionRouter);
 
 export default app;
