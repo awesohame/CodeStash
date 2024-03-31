@@ -7,11 +7,11 @@ import { Stash } from '../models/stash.model.js';
 import mongoose from 'mongoose';
 
 const createCollection = asyncHandler(async (req, res) => {
-    const { title, description, visibility, publiclyEditable, stashid } = req.body;
+    const { title, description, visibility, publiclyEditable, stashId } = req.body;
     let author = req.user;
 
     // come back to this after deciding whether stash id or stash object is passed
-    const stash = await Stash.findById(stashid);
+    const stash = await Stash.findById(stashId);
     if (!stash) {
         throw new ApiError(400, "one Stash is required");
     }
@@ -45,11 +45,48 @@ const createCollection = asyncHandler(async (req, res) => {
 
 });
 
-const addStashToCollection = asyncHandler(async (req, res) => {
 
+// controllers below not tested yet
+const addStashToCollection = asyncHandler(async (req, res) => {
+    const { collectionId, stashId } = req.body;
+
+    const collection = await Collection.findById(collectionId);
+
+    if (!collection) {
+        throw new ApiError(404, "Collection not found");
+    }
+
+    const stash = await Stash.findById(stashId);
+    if (!stash) {
+        throw new ApiError(404, "Stash not found");
+    }
+
+    collection.stashes.push(stash);
+    await collection.save();
+
+    return res.status(200).json(new ApiResponse(200, collection, "Stash added to collection successfully"));
 });
 
-const removeStashFromCollection = asyncHandler(async (req, res) => { });
+const removeStashFromCollection = asyncHandler(async (req, res) => {
+    const { collectionId, stashId } = req.body;
+
+    const collection = await Collection.findById(collectionId);
+
+    if (!collection) {
+        throw new ApiError(404, "Collection not found");
+    }
+
+    const stash = await Stash.findById(stashId);
+    if (!stash) {
+        throw new ApiError(404, "Stash not found");
+    }
+
+    collection.stashes.pull(stash);
+    await collection.save();
+
+    return res.status(200).json(new ApiResponse(200, collection, "Stash removed from collection successfully"));
+
+});
 
 const updateCollection = asyncHandler(async (req, res) => { });
 
