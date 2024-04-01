@@ -88,13 +88,42 @@ const removeStashFromCollection = asyncHandler(async (req, res) => {
 
 });
 
-const updateCollection = asyncHandler(async (req, res) => { });
+const updateCollectionDetails = asyncHandler(async (req, res) => {
+    const { collectionId, title, description, visibility, publiclyEditable } = req.body;
+
+    if (!collectionId) {
+        throw new ApiError(400, "Collection ID is required");
+    }
+
+    const collection = await Collection.findById(collectionId);
+
+    if (!collection) {
+        throw new ApiError(404, "Collection not found");
+    }
+
+    if (!title && !description && !visibility && publiclyEditable === undefined) {
+        throw new ApiError(400, "No data to update");
+    }
+
+    collection.title = title ? title : collection.title;
+    collection.description = description ? description : collection.description;
+    collection.visibility = visibility ? visibility : collection.visibility;
+    collection.publiclyEditable = publiclyEditable !== undefined ? publiclyEditable : collection.publiclyEditable;
+
+    await collection.save();
+
+    return res.status(200).json(new ApiResponse(200, collection, "Collection updated successfully"));
+});
 
 const deleteCollection = asyncHandler(async (req, res) => { });
 
 const getAllCollections = asyncHandler(async (req, res) => { }); // public collections
 
+const getCollectionsByUser = asyncHandler(async (req, res) => { });
 
+const getCollectionById = asyncHandler(async (req, res) => { });
+
+const getCollectionByTitle = asyncHandler(async (req, res) => { });
 
 export {
     createCollection,
