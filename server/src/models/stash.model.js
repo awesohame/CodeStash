@@ -32,6 +32,11 @@ const stashSchema = new Schema(
             required: true,
             default: false,
         },
+        uniqueSlug: {
+            type: String,
+            required: true,
+            unique: true,
+        },
     },
     { timestamps: true }
 )

@@ -6,7 +6,7 @@ import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
 
 const createStash = asyncHandler(async (req, res) => {
-    const { title, description, content, visibility, publiclyEditable } = req.body;
+    const { title, description, content, visibility, publiclyEditable, uniqueSlug } = req.body;
 
     let author = req.user;
     const isGuest = req.isGuest;
@@ -22,6 +22,25 @@ const createStash = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required");
     }
 
+    if (!visibility || publiclyEditable === undefined || publiclyEditable === null) {
+        throw new ApiError(400, "pass parameters visibility and publiclyEditable in frontend ");
+    }
+
+    if (!uniqueSlug) {
+        throw new ApiError(400, "Unique slug is required");
+    }
+
+    const isValidSlug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+    if (!isValidSlug.test(uniqueSlug)) {
+        throw new ApiError(400, "Invalid unique slug");
+    }
+
+    const existingStash = await Stash.findOne({ uniqueSlug });
+
+    if (existingStash) {
+        throw new ApiError(400, "Stash with this unique slug already exists");
+    }
+
     const stash = isGuest
         ? await Stash.create({
             title,
@@ -29,6 +48,7 @@ const createStash = asyncHandler(async (req, res) => {
             content,
             visibility: "public",
             publiclyEditable: true,
+            uniqueSlug
         })
         : await Stash.create({
             title,
@@ -37,6 +57,7 @@ const createStash = asyncHandler(async (req, res) => {
             content,
             visibility,
             publiclyEditable,
+            uniqueSlug
         });
 
     if (!stash) {
@@ -49,7 +70,25 @@ const createStash = asyncHandler(async (req, res) => {
 
 // get all public stashes
 const getPublicStashes = asyncHandler(async (req, res) => {
-    const stashes = await Stash.find({ visibility: "public" }).populate("author", "-password -refreshToken");
+    const stashes = await Stash.aggregate([
+        {
+            $match: {
+                visibility: "public"
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "author"
+            }
+        },
+        {
+            $unset: ["author.password", "author.refreshToken"]
+        }
+    ]);
+
     if (!stashes) {
         throw new ApiError(404, "No public stashes found");
     }
@@ -58,7 +97,25 @@ const getPublicStashes = asyncHandler(async (req, res) => {
 
 // get all stashes of current user
 const getStashesOfCurrentUser = asyncHandler(async (req, res) => {
-    const stashes = await Stash.find({ author: req.user._id }).populate("author", "-password -refreshToken");
+    const stashes = await Stash.aggregate([
+        {
+            $match: {
+                visibility: "public"
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "author"
+            }
+        },
+        {
+            $unset: ["author.password", "author.refreshToken"]
+        }
+    ]);
+
     if (!stashes) {
         throw new ApiError(404, "No stashes found");
     }
@@ -67,7 +124,7 @@ const getStashesOfCurrentUser = asyncHandler(async (req, res) => {
 
 
 // get stash of a user
-const getStashByUsername = asyncHandler(async (req, res) => {
+const getStashesByUsername = asyncHandler(async (req, res) => {
     const user = await User.findOne({ username: req.params.username });
 
     if (!user) {
@@ -134,11 +191,13 @@ const getStashesSortedByDate = asyncHandler(async (req, res) => {
 
 const updateStash = asyncHandler(async (req, res) => {
     const { title, description, content, visibility, publiclyEditable } = req.body;
+    const { uniqueSlug } = req.params;
 
     if (title === "" && content === "" && description === "" && visibility === "" && publiclyEditable === "") {
         throw new ApiError(400, "All fields are empty");
     }
-    const stash = await Stash.findById(req.params.id);
+
+    const stash = await Stash.findOne({ uniqueSlug });
 
     stash.title = title ? title : stash.title;
     stash.description = description ? description : stash.description;
@@ -156,8 +215,9 @@ const updateStash = asyncHandler(async (req, res) => {
 });
 
 const deleteStash = asyncHandler(async (req, res) => {
+    const { uniqueSlug } = req.params;
     try {
-        await Stash.findByIdAndDelete(req.params.id);
+        await Stash.findOneAndDelete({ uniqueSlug });
     } catch (error) {
         throw new ApiError(500, "Failed to delete stash");
     }
@@ -165,13 +225,28 @@ const deleteStash = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, {}, "Stash deleted successfully"));
 });
 
+// not tested yet
+const getStashBySlug = asyncHandler(async (req, res) => {
+    const { uniqueSlug } = req.params;
+
+    const stash = await Stash.findOne({ uniqueSlug });
+
+    if (!stash) {
+        throw new ApiError(404, "No stash found");
+    }
+
+    return res.status(200).json(new ApiResponse(200, stash, "Stash found"));
+});
+
+
 
 export {
     createStash,
     getPublicStashes,
     getStashesOfCurrentUser,
-    getStashByUsername,
+    getStashesByUsername,
     getStashesSortedByDate,
     updateStash,
-    deleteStash
+    deleteStash,
+    getStashBySlug
 }
