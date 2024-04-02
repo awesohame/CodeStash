@@ -34,6 +34,11 @@ const collectionSchema = new Schema(
                 required: true,
             },
         ],
+        uniqueSlug: {
+            type: String,
+            required: true,
+            unique: true,
+        },
     },
     {
         timestamps: true

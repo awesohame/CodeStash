@@ -7,7 +7,7 @@ import { Stash } from '../models/stash.model.js';
 import mongoose from 'mongoose';
 
 const createCollection = asyncHandler(async (req, res) => {
-    const { title, description, visibility, publiclyEditable, stashId } = req.body;
+    const { title, description, visibility, publiclyEditable, uniqueSlug, stashId } = req.body;
     let author = req.user;
 
     // come back to this after deciding whether stash id or stash object is passed
@@ -18,6 +18,21 @@ const createCollection = asyncHandler(async (req, res) => {
 
     if (!(title.trim())) {
         throw new ApiError(400, "Title is required");
+    }
+
+    if (!uniqueSlug) {
+        throw new ApiError(400, "Unique slug is required");
+    }
+
+    const isValidSlug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+    if (!isValidSlug.test(uniqueSlug)) {
+        throw new ApiError(400, "Invalid unique slug");
+    }
+
+    const existingCollection = await Collection.findOne({ uniqueSlug });
+
+    if (existingCollection) {
+        throw new ApiError(400, "Collection with this unique slug already exists");
     }
 
     if (!description) {
@@ -34,7 +49,8 @@ const createCollection = asyncHandler(async (req, res) => {
         author,
         visibility,
         publiclyEditable,
-        stashes: [stash]
+        stashes: [stash],
+        uniqueSlug
     });
 
     if (!collection) {
@@ -46,11 +62,11 @@ const createCollection = asyncHandler(async (req, res) => {
 });
 
 
-// controllers below not tested yet
 const addStashToCollection = asyncHandler(async (req, res) => {
-    const { collectionId, stashId } = req.body;
+    const { collectionSlug } = req.params;
+    const { stashId } = req.body;
 
-    const collection = await Collection.findById(collectionId);
+    const collection = await Collection.findOne({ uniqueSlug: collectionSlug });
 
     if (!collection) {
         throw new ApiError(404, "Collection not found");
@@ -67,6 +83,7 @@ const addStashToCollection = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, collection, "Stash added to collection successfully"));
 });
 
+// controllers below not tested yet
 const removeStashFromCollection = asyncHandler(async (req, res) => {
     const { collectionId, stashId } = req.body;
 
@@ -127,4 +144,5 @@ const getCollectionByTitle = asyncHandler(async (req, res) => { });
 
 export {
     createCollection,
+    addStashToCollection,
 };
