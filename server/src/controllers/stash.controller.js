@@ -190,20 +190,21 @@ const getStashesSortedByDate = asyncHandler(async (req, res) => {
 });
 
 const updateStash = asyncHandler(async (req, res) => {
-    const { title, description, content, visibility, publiclyEditable } = req.body;
-    const { uniqueSlug } = req.params;
+    const { title, description, content, visibility, publiclyEditable, uniqueSlug } = req.body;
+    const slug = req.params.uniqueSlug;
 
     if (title === "" && content === "" && description === "" && visibility === "" && publiclyEditable === "") {
         throw new ApiError(400, "All fields are empty");
     }
 
-    const stash = await Stash.findOne({ uniqueSlug });
+    const stash = await Stash.findOne({ uniqueSlug: slug });
 
     stash.title = title ? title : stash.title;
     stash.description = description ? description : stash.description;
     stash.content = content ? content : stash.content;
     stash.visibility = visibility ? visibility : stash.visibility;
     stash.publiclyEditable = publiclyEditable ? publiclyEditable : stash.publiclyEditable;
+    stash.uniqueSlug = uniqueSlug ? uniqueSlug : stash.uniqueSlug;
 
     await stash.save();
 
