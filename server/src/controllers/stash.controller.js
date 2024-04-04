@@ -163,6 +163,11 @@ const getStashesSortedByDate = asyncHandler(async (req, res) => {
     // const userIdToExclude = req.user._id;
     const stashes = await Stash.aggregate([
         {
+            $match: {
+                visibility: "public"
+            }
+        },
+        {
             $sort: {
                 createdAt: -1
             }
@@ -181,6 +186,41 @@ const getStashesSortedByDate = asyncHandler(async (req, res) => {
     ]);
 
 
+
+    if (!stashes) {
+        throw new ApiError(404, "No stashes found");
+    }
+
+    return res.status(200).json(new ApiResponse(200, stashes, "Stashes found"));
+});
+
+// get stash sorted by update date
+const getStashedSortedByUpdateDate = asyncHandler(async (req, res) => {
+    const lim = parseInt(req.body.limit) || 10;
+
+    const stashes = await Stash.aggregate([
+        {
+            $match: {
+                visibility: "public"
+            }
+        },
+        {
+            $sort: {
+                updatedAt: -1
+            }
+        },
+        {
+            $limit: lim
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "author"
+            }
+        }
+    ]);
 
     if (!stashes) {
         throw new ApiError(404, "No stashes found");
@@ -247,6 +287,7 @@ export {
     getStashesOfCurrentUser,
     getStashesByUsername,
     getStashesSortedByDate,
+    getStashedSortedByUpdateDate,
     updateStash,
     deleteStash,
     getStashBySlug

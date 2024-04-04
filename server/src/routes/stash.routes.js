@@ -5,6 +5,7 @@ import {
     getStashesOfCurrentUser,
     getStashesByUsername,
     getStashesSortedByDate,
+    getStashedSortedByUpdateDate,
     updateStash,
     deleteStash,
     getStashBySlug
@@ -17,7 +18,8 @@ router.route('/create').post(checkIfGuest, createStash)
 router.route('/public').get(getPublicStashes)
 router.route('/user').get(verifyJWT, getStashesOfCurrentUser)
 router.route('/users/:username').get(getStashesByUsername)
-router.route('/sorted').get(getStashesSortedByDate)
+router.route('/sorted-created').get(getStashesSortedByDate)
+router.route('/sorted-updated').get(getStashedSortedByUpdateDate)
 router.route('/update/:uniqueSlug').patch(verifyJWT, updateStash)
 router.route('/delete/:uniqueSlug').delete(verifyJWT, deleteStash)
 router.route('/:uniqueSlug').get(getStashBySlug)
