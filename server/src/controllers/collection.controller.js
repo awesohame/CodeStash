@@ -83,14 +83,19 @@ const addStashToCollection = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, collection, "Stash added to collection successfully"));
 });
 
-// controllers below not tested yet
 const removeStashFromCollection = asyncHandler(async (req, res) => {
-    const { collectionId, stashId } = req.body;
+    const { collectionSlug } = req.params;
+    const { stashId } = req.body;
+    const user = req.user;
 
-    const collection = await Collection.findById(collectionId);
+    const collection = await Collection.findOne({ uniqueSlug: collectionSlug })
 
     if (!collection) {
         throw new ApiError(404, "Collection not found");
+    }
+
+    if (collection.author.toString() !== user._id.toString()) {
+        throw new ApiError(403, "You are not authorized to perform this action");
     }
 
     const stash = await Stash.findById(stashId);
@@ -106,33 +111,71 @@ const removeStashFromCollection = asyncHandler(async (req, res) => {
 });
 
 const updateCollectionDetails = asyncHandler(async (req, res) => {
-    const { collectionId, title, description, visibility, publiclyEditable } = req.body;
+    const { title, description, visibility, publiclyEditable, collectionSlug, stashesId } = req.body;
+    const slug = req.params.collectionSlug;
+    const user = req.user;
 
-    if (!collectionId) {
-        throw new ApiError(400, "Collection ID is required");
-    }
-
-    const collection = await Collection.findById(collectionId);
+    const collection = await Collection.findOne({ uniqueSlug: slug });
 
     if (!collection) {
         throw new ApiError(404, "Collection not found");
     }
 
-    if (!title && !description && !visibility && publiclyEditable === undefined) {
+    if (collection.author.toString() !== user._id.toString() && !collection.publiclyEditable) {
+        throw new ApiError(403, "You are not authorized to perform this action");
+    }
+
+    if (!title && !description && !visibility && publiclyEditable === undefined && !collectionSlug && !stashesId) {
         throw new ApiError(400, "No data to update");
     }
 
-    collection.title = title ? title : collection.title;
-    collection.description = description ? description : collection.description;
-    collection.visibility = visibility ? visibility : collection.visibility;
-    collection.publiclyEditable = publiclyEditable !== undefined ? publiclyEditable : collection.publiclyEditable;
+    let stashes = [];
+    if (stashesId && Array.isArray(stashesId)) {
+        stashes = await Stash.find({ _id: { $in: stashesId } });
+    }
+
+    if (collection.author.toString() === user._id.toString()) {
+        collection.title = title ? title : collection.title;
+        collection.description = description ? description : collection.description;
+        collection.visibility = visibility ? visibility : collection.visibility;
+        collection.publiclyEditable = publiclyEditable !== undefined ? publiclyEditable : collection.publiclyEditable;
+        collection.uniqueSlug = collectionSlug ? collectionSlug : collection.uniqueSlug;
+        collection.stashes = stashes ? stashes : collection.stashes;
+
+    }
+
+    if (collection.publiclyEditable) {
+        collection.stashes = stashes ? stashes : collection.stashes;
+    }
 
     await collection.save();
 
     return res.status(200).json(new ApiResponse(200, collection, "Collection updated successfully"));
 });
 
-const deleteCollection = asyncHandler(async (req, res) => { });
+const deleteCollection = asyncHandler(async (req, res) => {
+    const { collectionSlug } = req.params;
+    const user = req.user;
+
+    const collection = await Collection.findOne({ uniqueSlug: collectionSlug });
+
+    if (!collection) {
+        throw new ApiError(404, "Collection not found");
+    }
+
+    if (collection.author.toString() !== user._id.toString()) {
+        throw new ApiError(403, "You are not authorized to perform this action");
+    }
+
+    try {
+        await collection.deleteOne();
+    }
+    catch (error) {
+        throw new ApiError(500, "Failed to delete collection");
+    }
+
+    return res.status(200).json(new ApiResponse(200, {}, "Collection deleted successfully"));
+});
 
 const getAllCollections = asyncHandler(async (req, res) => { }); // public collections
 
@@ -145,4 +188,7 @@ const getCollectionByTitle = asyncHandler(async (req, res) => { });
 export {
     createCollection,
     addStashToCollection,
+    removeStashFromCollection,
+    updateCollectionDetails,
+    deleteCollection,
 };
