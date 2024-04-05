@@ -97,9 +97,12 @@ const getPublicStashes = asyncHandler(async (req, res) => {
 
 // get all stashes of current user
 const getStashesOfCurrentUser = asyncHandler(async (req, res) => {
+    const user = req.user;
+
     const stashes = await Stash.aggregate([
         {
             $match: {
+                author: user._id,
                 visibility: "public"
             }
         },
@@ -135,7 +138,8 @@ const getStashesByUsername = asyncHandler(async (req, res) => {
     const stashes = await Stash.aggregate([
         {
             $match: {
-                author: new mongoose.Types.ObjectId(user._id),
+                // author: new mongoose.Types.ObjectId(user._id),
+                author: user._id,
                 visibility: "public"
             }
         },

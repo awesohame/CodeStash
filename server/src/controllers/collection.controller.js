@@ -179,9 +179,45 @@ const deleteCollection = asyncHandler(async (req, res) => {
 
 const getAllCollections = asyncHandler(async (req, res) => { }); // public collections
 
-const getCollectionsByUser = asyncHandler(async (req, res) => { });
+const getCollectionsByUsername = asyncHandler(async (req, res) => {
+    const { username } = req.params;
+    const user = await User.findOne({ username });
 
-const getCollectionById = asyncHandler(async (req, res) => { });
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const collections = await Collection.aggregate([
+        {
+            $match: {
+                // author: new mongoose.Types.ObjectId(user._id),
+                author: user._id,
+                visibility: "public"
+            }
+        },
+    ])
+
+    return res.status(200).json(new ApiResponse(200, collections, "Collections found"));
+});
+
+const getCollectionOfCurrentUser = asyncHandler(async (req, res) => {
+    const user = req.user;
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const collections = await Collection.aggregate([
+        {
+            $match: {
+                // author: new mongoose.Types.ObjectId(user._id),
+                author: user._id,
+            }
+        },
+    ])
+
+    return res.status(200).json(new ApiResponse(200, collections, "Collections found"));
+});
 
 const getCollectionByTitle = asyncHandler(async (req, res) => { });
 
@@ -191,4 +227,6 @@ export {
     removeStashFromCollection,
     updateCollectionDetails,
     deleteCollection,
+    getCollectionsByUsername,
+    getCollectionOfCurrentUser,
 };
