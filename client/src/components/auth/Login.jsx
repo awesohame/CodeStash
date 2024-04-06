@@ -10,24 +10,27 @@ export default function Login(
 ) {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        username: '',
-        password: ''
+        loginusername: '',
+        loginpassword: ''
     });
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData);
+        // console.log(formData);
         try {
             const response = await axios.post(
                 '/api/v1/users/login',
-                formData,
+                {
+                    username: formData.loginusername,
+                    password: formData.loginpassword
+                }
             );
             if (response.data && response.data.message) {
-                console.log(response.data)
+                // console.log(response.data)
                 alert(response.data.message);
-                navigate("/u");
+                navigate(`/u/${response.data.data.user.username}`);
             } else {
                 alert("An error occurred while submitting the form");
             }
@@ -53,13 +56,14 @@ export default function Login(
                     >
                         <div className="space-y-5">
                             <div>
-                                <label htmlFor="username" className="text-base font-medium text-gray-200">
+                                <label htmlFor="loginusername" className="text-base font-medium text-gray-200">
                                     {' '}
                                     Username{' '}
                                 </label>
                                 <div className="mt-2">
                                     <input
-                                        name='username'
+                                        id='loginusername'
+                                        name='loginusername'
                                         className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                                         type="text"
                                         placeholder="Enter your username"
@@ -70,14 +74,15 @@ export default function Login(
                             </div>
                             <div>
                                 <div className="flex items-center justify-between">
-                                    <label htmlFor="password" className="text-base font-medium text-gray-200">
+                                    <label htmlFor="loginpassword" className="text-base font-medium text-gray-200">
                                         {' '}
                                         Password{' '}
                                     </label>
                                 </div>
                                 <div className="mt-2">
                                     <input
-                                        name='password'
+                                        id='loginpassword'
+                                        name='loginpassword'
                                         className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                                         type="password"
                                         placeholder="Enter your password"

@@ -2,9 +2,9 @@ import { useState } from 'react'
 import logo from '../assets/logo.png'
 import { Menu, X } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import OutlineBtn from './buttons/OutlineBtn'
-import SolidBtn from './buttons/SolidBtn'
 import { Search } from 'lucide-react'
+
+import OutlineBtn from './buttons/OutlineBtn'
 import Modal from './auth/Modal'
 import Login from './auth/Login'
 import Register from './auth/Register'
@@ -56,7 +56,7 @@ export default function Navbar() {
                             src={logo}
                             alt="" />
                     </span>
-                    <span className="font-bold">CodeStash</span>
+                    <span className="font-black text-lg">CodeStash</span>
                 </div>
                 <div className="hidden grow items-start lg:flex">
                     <ul className="ml-12 inline-flex space-x-8">
@@ -67,9 +67,9 @@ export default function Navbar() {
                                     className={
                                         ({ isActive }) => (
                                             isActive ?
-                                                "text-sm font-semibold text-[#D5B263] border-b-2 border-[#D5B263] transition duration-200 ease-in-out"
+                                                "text-lg font-medium text-[#D5B263] transition duration-200 ease-in-out px-1"
                                                 :
-                                                "text-sm font-semibold text-[#ffffff] hover:text-[#D5B263] transition duration-200 ease-in-out"
+                                                "text-lg font-medium text-gray-400 hover:text-[#D5B263] transition duration-200 ease-in-out px-1"
                                         )
                                     }
                                 >
@@ -86,6 +86,8 @@ export default function Navbar() {
                     >
 
                         <input
+                            id='search'
+                            name='search'
                             className="flex h-10 w-[250px] rounded-l-md bg-gray-100 px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                             type="text"
                             placeholder="Search Stashes"
