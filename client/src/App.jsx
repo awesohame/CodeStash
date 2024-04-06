@@ -1,10 +1,10 @@
+import { Routes, Route, Outlet } from "react-router-dom"
+
 function App() {
   return (
-    <>
-      <div>
-        <h1>App</h1>
-      </div>
-    </>
+    <div className="border-2">
+      app
+    </div>
   )
 }
 
