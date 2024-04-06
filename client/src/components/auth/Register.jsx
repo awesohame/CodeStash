@@ -2,10 +2,14 @@ import logo from '../../assets/logo.png'
 import { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { setUser } from '../../store/slices/userSlice'
+import { setRegisterModal } from '../../store/slices/modalSlice'
 
 export default function Register({
     onSwitch
 }) {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         username: '',
@@ -27,11 +31,13 @@ export default function Register({
                     email: formData.registeremail
                 }
             );
-            console.log(response);
+
             if (response.data && response.data.message) {
                 // console.log(response.data)
                 alert(response.data.message);
-                navigate(`/u/${response.data.data.username}`);
+                dispatch(setUser(response.data.data.user));
+                dispatch(setRegisterModal(false));
+                navigate(`/u/${response.data.data.user.username}`);
             } else {
                 alert("An error occurred while submitting the form");
             }
@@ -42,8 +48,8 @@ export default function Register({
     };
 
     return (
-        <section>
-            <div className="flex items-center justify-center bg-[#293040] px-4 sm:px-6 lg:px-8 py-8 rounded-xl text-white">
+        <section className='w-full rounded-[2rem]'>
+            <div className="flex items-center justify-center bg-[#293040] px-4 sm:px-6 lg:px-8 py-8 rounded-[2rem] text-white">
                 <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
                     <div className="mb-2 flex justify-center">
                         <img src={logo} alt="logo" className="w-16 h-16" />
@@ -51,16 +57,7 @@ export default function Register({
                     <h2 className="text-center text-2xl font-bold leading-tight ">
                         Sign up to create account
                     </h2>
-                    {/* <p className="mt-2 text-center text-base text-gray-600">
-                        Already have an account?{' '}
-                        <a
-                            href="#"
-                            title=""
-                            className="font-medium  transition-all duration-200 hover:underline"
-                        >
-                            Sign In
-                        </a>
-                    </p> */}
+
                     <form
                         onSubmit={handleSubmit}
                         className="mt-8"
@@ -126,6 +123,16 @@ export default function Register({
                             </div>
                         </div>
                     </form>
+
+                    <p className="mt-2 text-center text-base text-gray-300">
+                        Already have an account?{' '}
+                        <button
+                            onClick={onSwitch}
+                            className="font-medium transition-all duration-200 hover:underline"
+                        >
+                            Sign In
+                        </button>
+                    </p>
 
                 </div>
             </div>

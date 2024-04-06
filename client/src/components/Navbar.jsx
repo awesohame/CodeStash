@@ -1,13 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import logo from '../assets/logo.png'
 import { Menu, X } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { Search } from 'lucide-react'
 
 import OutlineBtn from './buttons/OutlineBtn'
+import SolidBtn from './buttons/SolidBtn'
 import Modal from './auth/Modal'
 import Login from './auth/Login'
 import Register from './auth/Register'
+
+import { useSelector, useDispatch } from 'react-redux'
+import { setLoginModal, setRegisterModal } from '../store/slices/modalSlice'
+import { setUser, removeUser } from '../store/slices/userSlice'
+import axios from 'axios'
 
 const menuItems = [
     {
@@ -25,27 +31,62 @@ const menuItems = [
 ]
 
 export default function Navbar() {
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
     const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
 
-    const navigate = useNavigate()
+    const user = useSelector((state) => state.user)
+    useEffect(() => {
+        setIsLoggedIn(user.status)
+    }, [user, setUser])
+
+    const modal = useSelector((state) => state.modal)
+    useEffect(() => {
+        setIsLoginModalOpen(modal.loginModal)
+        setIsRegisterModalOpen(modal.registerModal)
+    }, [modal, setLoginModal, setRegisterModal])
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen)
     }
 
+    const handleLogout = async () => {
+        try {
+            const response = await axios.get('/api/v1/users/logout')
+            if (response.data && response.data.message) {
+                alert(response.data.message)
+            }
+            else {
+                alert('An error occurred while logging out')
+            }
+        } catch (err) {
+            console.log(err)
+        }
+
+        dispatch(removeUser())
+
+        navigate('/')
+    }
+
     return (
         <div className="relative w-full bg-[#293040] text-[#eae935]">
-            <Modal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)}>
+            <Modal open={isLoginModalOpen} onClose={() => {
+                dispatch(setLoginModal(false))
+            }}>
                 <Login onSwitch={() => {
-                    setIsLoginModalOpen(false)
+                    dispatch(setLoginModal(false))
+                    dispatch(setRegisterModal(true))
                 }} />
             </Modal>
-            <Modal open={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)}>
+            <Modal open={isRegisterModalOpen} onClose={() => {
+                dispatch(setRegisterModal(false))
+            }}>
                 <Register onSwitch={() => {
-                    setIsRegisterModalOpen(false)
+                    dispatch(setRegisterModal(false))
+                    dispatch(setLoginModal(true))
                 }} />
             </Modal>
             <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
@@ -100,24 +141,45 @@ export default function Navbar() {
 
                     </form>
                 </div>
-                <div className="hidden lg:block mx-2">
-                    <OutlineBtn
-                        btnText="Register"
-                        onClick={() => {
-                            setIsRegisterModalOpen(true)
-                        }}
-                        className="border-[#D5B263] text-[#D5B263] hover:bg-[#C9AD8B] hover:border-[#C9AD8B] hover:text-[#293040] transition duration-200 ease-in-out w-[4.5rem]"
-                    />
-                </div>
-                <div className='hidden lg:block mx-2'>
-                    <OutlineBtn
-                        btnText="Login"
-                        onClick={() => {
-                            setIsLoginModalOpen(true)
-                        }}
-                        className="border-[#D5B263] text-[#D5B263] hover:bg-[#C9AD8B] hover:border-[#C9AD8B] hover:text-[#293040] transition duration-200 ease-in-out w-[4.5rem]"
-                    />
-                </div>
+
+                {
+                    isLoggedIn ?
+                        (
+                            <>
+                                <div className="hidden lg:block mx-2">
+                                    <SolidBtn
+                                        btnText="Logout"
+                                        onClick={handleLogout}
+                                        className="bg-[#D5B263] text-[#293040] border-[#C9AD8B] hover:bg-[#C9AD8B] hover:border-[#C9AD8B] transition duration-200 ease-in-out w-[4.5rem]"
+                                    />
+                                </div>
+                            </>
+                        )
+                        :
+                        (
+                            <>
+                                <div className="hidden lg:block mx-2">
+                                    <OutlineBtn
+                                        btnText="Register"
+                                        onClick={() => {
+                                            dispatch(setRegisterModal(true))
+                                        }}
+                                        className="border-[#D5B263] text-[#D5B263] hover:bg-[#C9AD8B] hover:border-[#C9AD8B] hover:text-[#293040] transition duration-200 ease-in-out w-[4.5rem]"
+                                    />
+                                </div>
+                                <div className='hidden lg:block mx-2'>
+                                    <OutlineBtn
+                                        btnText="Login"
+                                        onClick={() => {
+                                            dispatch(setLoginModal(true))
+                                        }}
+                                        className="border-[#D5B263] text-[#D5B263] hover:bg-[#C9AD8B] hover:border-[#C9AD8B] hover:text-[#293040] transition duration-200 ease-in-out w-[4.5rem]"
+                                    />
+                                </div>
+                            </>
+                        )
+                }
+
                 <div className="lg:hidden">
                     <Menu onClick={toggleMenu} className="h-6 w-6 cursor-pointer" />
                 </div>
@@ -173,7 +235,7 @@ export default function Navbar() {
                                     <OutlineBtn
                                         btnText="Register"
                                         onClick={() => {
-                                            setIsRegisterModalOpen(true)
+                                            dispatch(setRegisterModal(true))
                                         }}
                                         className="border-[#D5B263] text-[#D5B263] hover:bg-[#C9AD8B] hover:border-[#C9AD8B] hover:text-[#293040] transition duration-200 ease-in-out w-[4.5rem]"
                                     />
@@ -182,7 +244,7 @@ export default function Navbar() {
                                     <OutlineBtn
                                         btnText="Login"
                                         onClick={() => {
-                                            setIsLoginModalOpen(true)
+                                            dispatch(setLoginModal(true))
                                         }}
                                         className="border-[#D5B263] text-[#D5B263] hover:bg-[#C9AD8B] hover:border-[#C9AD8B] hover:text-[#293040] transition duration-200 ease-in-out w-[4.5rem]"
                                     />

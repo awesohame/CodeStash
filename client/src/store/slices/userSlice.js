@@ -11,11 +11,11 @@ export const userSlice = createSlice({
     reducers: {
         setUser: (state, action) => {
             state.status = true;
-            state.user = action.payload;
+            state.data = action.payload;
         },
         removeUser: (state) => {
             state.status = false;
-            state.user = null;
+            state.data = null;
         },
     },
 });

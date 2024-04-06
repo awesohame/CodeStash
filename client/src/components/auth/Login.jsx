@@ -2,12 +2,16 @@ import logo from '../../assets/logo.png'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
+import { setUser } from '../../store/slices/userSlice'
+import { setLoginModal } from '../../store/slices/modalSlice'
 
 export default function Login(
     {
         onSwitch
     }
 ) {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         loginusername: '',
@@ -30,6 +34,8 @@ export default function Login(
             if (response.data && response.data.message) {
                 // console.log(response.data)
                 alert(response.data.message);
+                dispatch(setUser(response.data.data.user));
+                dispatch(setLoginModal(false));
                 navigate(`/u/${response.data.data.user.username}`);
             } else {
                 alert("An error occurred while submitting the form");
@@ -101,7 +107,7 @@ export default function Login(
                                 </button>
                             </div>
                         </div>
-                        {/* <p className="mt-2 text-center text-sm text-gray-300 ">
+                        <p className="mt-2 text-center text-sm text-gray-300 ">
                             Don&apos;t have an account?{' '}
                             <button
                                 onClick={onSwitch}
@@ -110,7 +116,7 @@ export default function Login(
                             >
                                 Create a free account
                             </button>
-                        </p> */}
+                        </p>
                     </form>
                 </div>
             </div>
