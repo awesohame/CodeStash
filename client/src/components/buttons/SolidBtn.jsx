@@ -3,8 +3,11 @@ import { twMerge } from "tailwind-merge";
 export default function SolidBtn(
     {
         btnText = "Button",
-        onClick = () => { },
+        onClick = () => {
+            console.log("No action provided for button click")
+        },
         className = "",
+        btnIcon = <></>
     }
 ) {
     return (
@@ -12,11 +15,12 @@ export default function SolidBtn(
             <button
                 type="button"
                 className={twMerge(
-                    "border-2 rounded-md px-3 py-2 text-sm font-semibold shadow-sm",
+                    "flex justify-evenly items-center border-2 rounded-md px-3 py-2 text-sm font-semibold shadow-sm",
                     className
                 )}
                 onClick={onClick}
             >
+                {btnIcon}
                 {btnText}
             </button>
         </div>

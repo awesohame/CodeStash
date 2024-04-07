@@ -1,25 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    status: false,
     loginModal: false,
     registerModal: false,
 }
 
-export const userSlice = createSlice({
-    name: 'user',
+export const modalSlice = createSlice({
+    name: 'modal',
     initialState: initialState,
     reducers: {
         setLoginModal: (state, action) => {
-            state.status = true;
             state.loginModal = action.payload;
         },
         setRegisterModal: (state, action) => {
-            state.status = true;
             state.registerModal = action.payload;
         },
     },
 });
 
-export const { setLoginModal, setRegisterModal } = userSlice.actions;
-export default userSlice.reducer;
+export const { setLoginModal, setRegisterModal } = modalSlice.actions;
+export default modalSlice.reducer;

@@ -43,6 +43,10 @@ const router = createBrowserRouter([
         element: <div>Search Page</div>,
       },
       {
+        path: "create-stash",
+        element: <div>Create Stash Page</div>,
+      },
+      {
         path: "u",
         element: <Outlet />,
         children: [
@@ -66,6 +70,24 @@ const router = createBrowserRouter([
           }
         ],
       },
+      {
+        path: "help",
+        element: <Outlet />,
+        children: [
+          {
+            path: "suggestions",
+            element: <div>Suggestions Page</div>,
+          },
+          {
+            path: "contact",
+            element: <div>Contact Page</div>,
+          },
+          {
+            path: "about",
+            element: <div>About Page</div>,
+          }
+        ]
+      }
     ],
   },
 ]);

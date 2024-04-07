@@ -13,6 +13,7 @@ import Register from '../auth/Register'
 import { useSelector, useDispatch } from 'react-redux'
 import { setLoginModal, setRegisterModal } from '../../store/slices/modalSlice'
 import { setUser, removeUser } from '../../store/slices/userSlice'
+import { setOnMobile } from '../../store/slices/deviceSlice'
 import axios from 'axios'
 
 const menuItems = [
@@ -33,6 +34,7 @@ const menuItems = [
 export default function Navbar() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
@@ -47,6 +49,14 @@ export default function Navbar() {
         e.preventDefault()
         navigate(`/search?q=${searchBarData}`)
     }
+
+    useEffect(() => {
+        if (window.innerWidth < 768) {
+            dispatch(setOnMobile(true))
+        }
+    }, [])
+
+    const onMobile = useSelector((state) => state.device.onMobile)
 
     const user = useSelector((state) => state.user)
     useEffect(() => {
@@ -107,7 +117,7 @@ export default function Navbar() {
                             src={logo}
                             alt="" />
                     </span>
-                    <span className="font-black text-lg">CodeStash</span>
+                    {!onMobile && <span className="font-black text-lg">CodeStash</span>}
                 </div>
                 <div className="hidden grow items-start lg:flex">
                     <ul className="ml-12 inline-flex space-x-8">
@@ -130,29 +140,31 @@ export default function Navbar() {
                         ))}
                     </ul>
                 </div>
-                <div className="flex grow justify-end">
-                    <form
-                        className='flex mx-4 text-[#293040]'
-                        onSubmit={handleSearchSubmit}
-                    >
-
-                        <input
-                            id='search'
-                            name='search'
-                            className="flex h-10 w-[250px] rounded-l-md bg-gray-100 px-3 py-2 text-sm placeholder:text-gray-400 placeholder:font-extralight focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                            type="text"
-                            placeholder="Search Stashes"
-                            value={searchBarData}
-                            onChange={handleSearchBarChange}
+                {!onMobile &&
+                    <div className="flex grow justify-end">
+                        <form
+                            className='flex mx-4 text-[#293040]'
+                            onSubmit={handleSearchSubmit}
                         >
-                        </input>
 
-                        <button type="submit" className="bg-[#101219] px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-black/80 rounded-r-md hover:text-[#D5B263]">
-                            <Search className="h-4 w-4" />
-                        </button>
+                            <input
+                                id='search'
+                                name='search'
+                                className="flex h-10 w-[250px] rounded-l-md bg-gray-100 px-3 py-2 text-sm placeholder:text-gray-400 placeholder:font-extralight focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                type="text"
+                                placeholder="Search Stashes"
+                                value={searchBarData}
+                                onChange={handleSearchBarChange}
+                            >
+                            </input>
 
-                    </form>
-                </div>
+                            <button type="submit" className="bg-[#101219] px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-black/80 rounded-r-md hover:text-[#D5B263]">
+                                <Search className="h-4 w-4" />
+                            </button>
+
+                        </form>
+                    </div>
+                }
 
                 {
                     isLoggedIn ?
