@@ -39,6 +39,10 @@ const router = createBrowserRouter([
         element: <div>Public Stashes Page</div>,
       },
       {
+        path: "search",
+        element: <div>Search Page</div>,
+      },
+      {
         path: "u",
         element: <Outlet />,
         children: [

@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react'
-import logo from '../assets/logo.png'
+import logo from '../../assets/logo.png'
 import { Menu, X } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { Search } from 'lucide-react'
 
-import OutlineBtn from './buttons/OutlineBtn'
-import SolidBtn from './buttons/SolidBtn'
-import Modal from './auth/Modal'
-import Login from './auth/Login'
-import Register from './auth/Register'
+import OutlineBtn from '../buttons/OutlineBtn'
+import SolidBtn from '../buttons/SolidBtn'
+import Modal from '../auth/Modal'
+import Login from '../auth/Login'
+import Register from '../auth/Register'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { setLoginModal, setRegisterModal } from '../store/slices/modalSlice'
-import { setUser, removeUser } from '../store/slices/userSlice'
+import { setLoginModal, setRegisterModal } from '../../store/slices/modalSlice'
+import { setUser, removeUser } from '../../store/slices/userSlice'
 import axios from 'axios'
 
 const menuItems = [
@@ -37,6 +37,16 @@ export default function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
     const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
+    const [searchBarData, setSearchBarData] = useState('')
+
+    const handleSearchBarChange = (e) => {
+        setSearchBarData(e.target.value)
+    }
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault()
+        navigate(`/search?q=${searchBarData}`)
+    }
 
     const user = useSelector((state) => state.user)
     useEffect(() => {
@@ -108,9 +118,9 @@ export default function Navbar() {
                                     className={
                                         ({ isActive }) => (
                                             isActive ?
-                                                "text-lg font-medium text-[#D5B263] transition duration-200 ease-in-out px-1"
+                                                "text-lg font-semibold text-[#D5B263] transition duration-200 ease-in-out px-1"
                                                 :
-                                                "text-lg font-medium text-gray-400 hover:text-[#D5B263] transition duration-200 ease-in-out px-1"
+                                                "text-lg font-medium text-gray-400 hover:text-[#D5B263] hover:font-semibold transition duration-200 ease-in-out px-1"
                                         )
                                     }
                                 >
@@ -122,16 +132,18 @@ export default function Navbar() {
                 </div>
                 <div className="flex grow justify-end">
                     <form
-                        className='flex mx-4'
-                        onSubmit={() => { }}
+                        className='flex mx-4 text-[#293040]'
+                        onSubmit={handleSearchSubmit}
                     >
 
                         <input
                             id='search'
                             name='search'
-                            className="flex h-10 w-[250px] rounded-l-md bg-gray-100 px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex h-10 w-[250px] rounded-l-md bg-gray-100 px-3 py-2 text-sm placeholder:text-gray-400 placeholder:font-extralight focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                             type="text"
                             placeholder="Search Stashes"
+                            value={searchBarData}
+                            onChange={handleSearchBarChange}
                         >
                         </input>
 
