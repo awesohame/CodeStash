@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import logo from '../../assets/logo.png'
 import { Menu, X } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
@@ -14,7 +14,10 @@ import { useSelector, useDispatch } from 'react-redux'
 import { setLoginModal, setRegisterModal } from '../../store/slices/modalSlice'
 import { setUser, removeUser } from '../../store/slices/userSlice'
 import { setOnMobile } from '../../store/slices/deviceSlice'
+import { toggleUserDropdown } from '../../store/slices/dropdownSlice'
 import axios from 'axios'
+
+import UserDropdown from '../auth/UserDropdown'
 
 const menuItems = [
     {
@@ -34,6 +37,21 @@ const menuItems = [
 export default function Navbar() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
+    const dropdownRef = useRef(null)
+
+    const handleClickOutside = (e) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+            dispatch(toggleUserDropdown())
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -59,7 +77,23 @@ export default function Navbar() {
     const onMobile = useSelector((state) => state.device.onMobile)
 
     const user = useSelector((state) => state.user)
+
+    const checkUser = async () => {
+        try {
+            const response = await axios.get('/api/v1/users/getuser')
+            if (response.data && response.data.data) {
+                // console.log("Logged in : ", response.data.data)
+                dispatch(setUser(response.data.data))
+            }
+        } catch (error) {
+            console.log("Not Logged in : ", error)
+        }
+    }
+
     useEffect(() => {
+        if (!user.status) {
+            checkUser()
+        }
         setIsLoggedIn(user.status)
     }, [user, setUser])
 
@@ -73,26 +107,8 @@ export default function Navbar() {
         setIsMenuOpen(!isMenuOpen)
     }
 
-    const handleLogout = async () => {
-        try {
-            const response = await axios.get('/api/v1/users/logout')
-            if (response.data && response.data.message) {
-                alert(response.data.message)
-            }
-            else {
-                alert('An error occurred while logging out')
-            }
-        } catch (err) {
-            console.log(err)
-        }
-
-        dispatch(removeUser())
-
-        navigate('/')
-    }
-
     return (
-        <div className="relative w-full bg-[#293040] text-[#eae935]">
+        <div ref={dropdownRef} className="relative w-full bg-[#293040] text-[#eae935]">
             <Modal open={isLoginModalOpen} onClose={() => {
                 dispatch(setLoginModal(false))
             }}>
@@ -150,7 +166,7 @@ export default function Navbar() {
                             <input
                                 id='search'
                                 name='search'
-                                className="flex h-10 w-[250px] rounded-l-md bg-gray-100 px-3 py-2 text-sm placeholder:text-gray-400 placeholder:font-extralight focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex h-10 w-[250px] rounded-l-[0.3rem] bg-gray-100 px-3 py-2 text-sm placeholder:text-gray-400 placeholder:font-extralight focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                 type="text"
                                 placeholder="Search Stashes"
                                 value={searchBarData}
@@ -158,7 +174,7 @@ export default function Navbar() {
                             >
                             </input>
 
-                            <button type="submit" className="bg-[#101219] px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-black/80 rounded-r-md hover:text-[#D5B263]">
+                            <button type="submit" className="bg-[#101219] px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-black/80 rounded-r-[0.3rem] hover:text-[#D5B263]">
                                 <Search className="h-4 w-4" />
                             </button>
 
@@ -170,13 +186,14 @@ export default function Navbar() {
                     isLoggedIn ?
                         (
                             <>
-                                <div className="hidden lg:block mx-2">
+                                {/* <div className="hidden lg:block mx-2">
                                     <SolidBtn
                                         btnText="Logout"
                                         onClick={handleLogout}
                                         className="bg-[#D5B263] text-[#293040] border-[#C9AD8B] hover:bg-[#C9AD8B] hover:border-[#C9AD8B] transition duration-200 ease-in-out w-[4.5rem]"
                                     />
-                                </div>
+                                </div> */}
+                                <UserDropdown />
                             </>
                         )
                         :
