@@ -14,7 +14,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { setLoginModal, setRegisterModal } from '../../store/slices/modalSlice'
 import { setUser, removeUser } from '../../store/slices/userSlice'
 import { setOnMobile } from '../../store/slices/deviceSlice'
-import { toggleUserDropdown } from '../../store/slices/dropdownSlice'
+import { closeUserDropdown } from '../../store/slices/dropdownSlice'
 import axios from 'axios'
 
 import UserDropdown from '../auth/UserDropdown'
@@ -42,7 +42,7 @@ export default function Navbar() {
 
     const handleClickOutside = (e) => {
         if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-            dispatch(toggleUserDropdown())
+            dispatch(closeUserDropdown())
         }
     };
 

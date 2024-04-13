@@ -12,6 +12,7 @@ import RootLayout from './layouts/RootLayout.jsx'
 
 // pages
 import Home from './pages/Home.jsx'
+import CreateStash from './pages/CreateStash.jsx'
 
 import { Outlet } from 'react-router-dom';
 
@@ -44,7 +45,7 @@ const router = createBrowserRouter([
       },
       {
         path: "create-stash",
-        element: <div>Create Stash Page</div>,
+        element: <CreateStash />,
       },
       {
         path: "u",

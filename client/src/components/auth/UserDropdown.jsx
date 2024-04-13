@@ -66,7 +66,7 @@ export default function UserDropdown() {
                     <span className="mr-2 min-w-24 text-left">{user?.username}</span>
                     <FaChevronDown className={`my-auto h-3 transform transition-transform duration-[600ms] ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
-                <div className={`text-sm absolute w-full right-0 mt-2 py-2 rounded-[0.3rem] shadow-lg bg-[#384157] ring-1 ring-black ring-opacity-5 p-1 space-y-1 ${isDropdownOpen ? '' : 'hidden'}`}>
+                <div className={`text-sm absolute w-full right-0 mt-2 py-2 rounded-[0.3rem] shadow-lg bg-[#384157] ring-1 ring-black ring-opacity-5 px-2 space-y-1 ${isDropdownOpen ? '' : 'hidden'}`}>
 
                     {
                         dropdownItems.map((item, index) => (
@@ -77,7 +77,7 @@ export default function UserDropdown() {
                                     ({ isActive }) => (isActive ? (
                                         "flex items-center w-full px-2 py-2 text-[#D5B263] bg-[#293040] cursor-pointer rounded-md"
                                     ) : (
-                                        "flex items-center w-full px-2 py-2 text-gray-300 hover:text-[#D5B263] hover:bg-[#293040] cursor-pointer rounded-md"
+                                        "flex items-center w-full px-2 py-2 text-gray-300 hover:text-[#D5B263] hover:bg-[#293040] cursor-pointer rounded-[0.3rem]"
                                     )
                                     )
                                 }
@@ -89,7 +89,7 @@ export default function UserDropdown() {
 
                     <button
                         onClick={handleLogout}
-                        className="flex items-center w-full px-2 py-2 text-gray-300 hover:text-[#D5B263] hover:bg-[#293040] cursor-pointer rounded-md"
+                        className="flex items-center w-full px-2 py-2 text-gray-200 hover:bg-red-700 cursor-pointer rounded-[0.3rem] text-[22px] bg-red-600"
                     >
                         <CiLogout className='mr-2' /> Logout
                     </button>

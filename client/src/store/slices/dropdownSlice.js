@@ -11,8 +11,11 @@ export const dropdownSlice = createSlice({
         toggleUserDropdown: (state) => {
             state.userDropdown = !state.userDropdown;
         },
+        closeUserDropdown: (state) => {
+            state.userDropdown = false;
+        }
     }
 });
 
-export const { toggleUserDropdown } = dropdownSlice.actions;
+export const { toggleUserDropdown, closeUserDropdown } = dropdownSlice.actions;
 export default dropdownSlice.reducer;
