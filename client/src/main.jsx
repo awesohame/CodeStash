@@ -13,6 +13,7 @@ import RootLayout from './layouts/RootLayout.jsx'
 // pages
 import Home from './pages/Home.jsx'
 import CreateStash from './pages/CreateStash.jsx'
+import Profile from './pages/Profile.jsx';
 
 import { Outlet } from 'react-router-dom';
 
@@ -53,7 +54,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: ":username",
-            element: <div>User Profile Page</div>,
+            element: <Profile />,
           },
         ],
       },
