@@ -17,7 +17,7 @@ export default function Home() {
     }
 
     return (
-        <div className="relative flex flex-col items-center w-full px-4 md:flex-row sm:px-24 p-8 bg-[#202632]">
+        <main className="relative flex flex-col items-center w-full px-4 md:flex-row sm:px-24 p-8 bg-[#202632]">
             <div className="flex items-center py-5 md:w-1/2 md:pb-20 md:pt-10 md:pr-10">
                 <div className="text-left">
                     <h2
@@ -46,6 +46,6 @@ export default function Home() {
                     </div>
                 </div>
             }
-        </div>
+        </main>
     )
 }

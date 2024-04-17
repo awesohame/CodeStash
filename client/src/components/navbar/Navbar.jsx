@@ -34,6 +34,8 @@ const menuItems = [
     },
 ]
 
+export const navbarHeight = 16
+
 export default function Navbar() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -108,7 +110,7 @@ export default function Navbar() {
     }
 
     return (
-        <div ref={dropdownRef} className="relative w-full bg-[#293040] text-[#eae935]">
+        <div ref={dropdownRef} className={`h-[${navbarHeight}px] relative w-full bg-[#293040] text-[#eae935]`}>
             <Modal open={isLoginModalOpen} onClose={() => {
                 dispatch(setLoginModal(false))
             }}>

@@ -1,43 +1,43 @@
-import { toggleUserDropdown } from '../../store/slices/dropdownSlice'
+import { toggleUserDropdown, closeUserDropdown } from '../../store/slices/dropdownSlice'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { removeUser } from '../../store/slices/userSlice'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-
 import { Link, NavLink } from 'react-router-dom';
+
 import { FaChevronDown, FaLayerGroup } from "react-icons/fa6";
 import { FaUser, FaCog, FaBoxes } from "react-icons/fa";
 import { CiLogout } from "react-icons/ci";
-
-const dropdownItems = [
-    {
-        name: 'Profile',
-        to: '/u/profile',
-        icon: <FaUser className='mr-2' />,
-    },
-    {
-        name: 'Settings',
-        to: '/u/settings',
-        icon: <FaCog className='mr-2' />,
-    },
-    {
-        name: 'My Stashes',
-        to: '/u/stashes',
-        icon: <FaBoxes className='mr-2' />,
-    },
-    {
-        name: 'My Collections',
-        to: '/u/collections',
-        icon: <FaLayerGroup className='mr-2' />,
-    },
-]
 
 export default function UserDropdown() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const isDropdownOpen = useSelector(state => state.dropdown.userDropdown);
     const user = useSelector(state => state.user.data);
+
+    const dropdownItems = [
+        {
+            name: 'Profile',
+            to: `/u/${user?.username}`,
+            icon: <FaUser className='mr-2' />,
+        },
+        {
+            name: 'Settings',
+            to: '/u/settings',
+            icon: <FaCog className='mr-2' />,
+        },
+        {
+            name: 'My Stashes',
+            to: '/u/stashes',
+            icon: <FaBoxes className='mr-2' />,
+        },
+        {
+            name: 'My Collections',
+            to: '/u/collections',
+            icon: <FaLayerGroup className='mr-2' />,
+        },
+    ]
 
     const toggleDropdown = () => {
         dispatch(toggleUserDropdown());
@@ -49,6 +49,7 @@ export default function UserDropdown() {
             if (response.data && response.data.message) {
                 alert(response.data.message)
                 dispatch(removeUser())
+                dispatch(closeUserDropdown())
                 navigate('/')
             }
             else {

@@ -45,7 +45,7 @@ export default function Footer() {
     const onMobile = useSelector(state => state.device.onMobile)
 
     return (
-        <section className="flex justify-around overflow-hidden bg-[#293040] text-gray-300 py-2 w-full">
+        <section className="flex justify-around overflow-hidden bg-[#293040] text-gray-300 py-4 w-full">
             {!onMobile &&
                 <div className='flex items-center w-1/4 '>
                     {/* <Link to='/'>
