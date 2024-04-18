@@ -114,7 +114,7 @@ const updateCollectionDetails = asyncHandler(async (req, res) => {
     const { title, description, visibility, publiclyEditable, collectionSlug, stashesId } = req.body;
     const slug = req.params.collectionSlug;
     const user = req.user;
-
+    console.log(slug)
     const collection = await Collection.findOne({ uniqueSlug: slug });
 
     if (!collection) {
@@ -141,7 +141,6 @@ const updateCollectionDetails = asyncHandler(async (req, res) => {
         collection.publiclyEditable = publiclyEditable !== undefined ? publiclyEditable : collection.publiclyEditable;
         collection.uniqueSlug = collectionSlug ? collectionSlug : collection.uniqueSlug;
         collection.stashes = stashes ? stashes : collection.stashes;
-
     }
 
     if (collection.publiclyEditable) {

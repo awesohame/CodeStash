@@ -19,7 +19,7 @@ export default function SolidBtn(
                 className={twMerge(
                     "flex justify-evenly items-center border-2 rounded-md px-3 py-2 text-sm font-semibold shadow-sm",
                     className,
-                    disabled ? "bg-gray-300 cursor-not-allowed text-gray-500" : ""
+                    disabled ? "bg-gray-300 cursor-not-allowed text-gray-500 hover:bg-gray-300 hover:text-gray-500" : ""
                 )}
                 onClick={onClick}
             >
