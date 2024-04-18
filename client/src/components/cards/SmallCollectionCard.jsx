@@ -14,7 +14,7 @@ export default function SmallCollectionCard({
                         key={collection._id}
                         className='w-full h-24 bg-[#384157] rounded-lg mb-2'
                     >
-                        <div className="flex flex-col items-center justify-between h-full my-2 px-4 py-4 w-full bg-[#293040] text-gray-300 rounded-lg">
+                        <div className="flex flex-col items-center justify-between h-full my-2 px-4 py-4 w-full bg-[#293040] text-gray-300 rounded-lg hover:bg-[#202632] hover:text-gray-300 transition-colors duration-200 ease-in-out">
                             <div className="flex h-[50%] w-full items-center">
                                 <div className="grow font-semibold text-lg/6">
                                     {collection.title?.substring(0, 15)?.trim()}

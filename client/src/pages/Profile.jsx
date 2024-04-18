@@ -29,7 +29,7 @@ function Profile() {
         }
         async function getCollections() {
             const collectionArr = await axios.get(`/api/v1/collections/users/${username}`)
-            console.log(collectionArr.data.data)
+            // console.log(collectionArr.data.data)
             setCollections(collectionArr.data.data);
         }
         getStashes()

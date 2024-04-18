@@ -207,7 +207,7 @@ export default function Navbar() {
                                         onClick={() => {
                                             dispatch(setRegisterModal(true))
                                         }}
-                                        className="border-[#D5B263] text-[#D5B263] hover:bg-[#C9AD8B] hover:border-[#C9AD8B] hover:text-[#293040] transition duration-200 ease-in-out w-[4.5rem]"
+                                        className="border-[#D5B263] text-[#D5B263] hover:bg-[#D5B263] hover:border-[#D5B263] hover:text-[#293040] transition duration-200 ease-in-out w-[4.5rem]"
                                     />
                                 </div>
                                 <div className='hidden lg:block mx-2'>
@@ -216,7 +216,7 @@ export default function Navbar() {
                                         onClick={() => {
                                             dispatch(setLoginModal(true))
                                         }}
-                                        className="border-[#D5B263] text-[#D5B263] hover:bg-[#C9AD8B] hover:border-[#C9AD8B] hover:text-[#293040] transition duration-200 ease-in-out w-[4.5rem]"
+                                        className="border-[#D5B263] text-[#D5B263] hover:bg-[#D5B263] hover:border-[#D5B263] hover:text-[#293040] transition duration-200 ease-in-out w-[4.5rem]"
                                     />
                                 </div>
                             </>
