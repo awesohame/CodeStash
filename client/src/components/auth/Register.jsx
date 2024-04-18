@@ -6,6 +6,10 @@ import { useDispatch } from 'react-redux'
 import { setUser } from '../../store/slices/userSlice'
 import { setRegisterModal } from '../../store/slices/modalSlice'
 
+import { FaCheckCircle } from "react-icons/fa";
+import { MdError } from "react-icons/md";
+import useToast from '../../hooks/useToast'
+
 export default function Register({
     onSwitch
 }) {
@@ -34,16 +38,31 @@ export default function Register({
 
             if (response.data && response.data.message) {
                 // console.log(response.data)
-                alert(response.data.message);
+                // alert(response.data.message);
                 dispatch(setUser(response.data.data.user));
                 dispatch(setRegisterModal(false));
+                useToast({
+                    message: `Registered user ${response.data.data.user.username}`,
+                    type: 'success',
+                    icon: <FaCheckCircle className='text-green-400 text-lg' />,
+                })
                 navigate(`/u/${response.data.data.user.username}`);
             } else {
-                alert("An error occurred while submitting the form");
+                // alert("An error occurred while submitting the form");
+                useToast({
+                    message: "Registration Failed",
+                    type: 'error',
+                    icon: <MdError className='text-red-400 text-xl' />,
+                })
             }
         }
         catch (err) {
             console.log(err);
+            useToast({
+                message: "Registration Failed",
+                type: 'error',
+                icon: <MdError className='text-red-400 text-xl' />,
+            })
         }
     };
 

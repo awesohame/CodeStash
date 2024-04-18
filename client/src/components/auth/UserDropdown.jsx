@@ -10,6 +10,10 @@ import { FaChevronDown, FaLayerGroup } from "react-icons/fa6";
 import { FaUser, FaCog, FaBoxes } from "react-icons/fa";
 import { CiLogout } from "react-icons/ci";
 
+import { FaCheckCircle } from "react-icons/fa";
+import { MdError } from "react-icons/md";
+import useToast from '../../hooks/useToast'
+
 export default function UserDropdown() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -47,16 +51,31 @@ export default function UserDropdown() {
         try {
             const response = await axios.get('/api/v1/users/logout')
             if (response.data && response.data.message) {
-                alert(response.data.message)
+                // alert(response.data.message)
                 dispatch(removeUser())
                 dispatch(closeUserDropdown())
+                useToast({
+                    message: 'Logged out',
+                    type: 'success',
+                    icon: <FaCheckCircle className='text-green-400 text-lg' />,
+                })
                 navigate('/')
             }
             else {
-                alert('An error occurred while logging out')
+                // alert('An error occurred while logging out')
+                useToast({
+                    message: 'Logout Failed',
+                    type: 'error',
+                    icon: <MdError className='text-red-400 text-xl' />,
+                })
             }
         } catch (err) {
             console.log(err)
+            useToast({
+                message: 'Logout Failed',
+                type: 'error',
+                icon: <MdError className='text-red-400 text-xl' />,
+            })
         }
     }
 

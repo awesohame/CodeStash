@@ -1,10 +1,18 @@
 import logo from '../../assets/logo.png'
+
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import { useDispatch } from 'react-redux'
+import useToast from '../../hooks/useToast'
+
 import { setUser } from '../../store/slices/userSlice'
 import { setLoginModal } from '../../store/slices/modalSlice'
+
+import { FaCheckCircle } from "react-icons/fa";
+import { MdError } from "react-icons/md";
+
+import axios from 'axios'
+
 
 export default function Login(
     {
@@ -33,16 +41,31 @@ export default function Login(
             );
             if (response.data && response.data.message) {
                 // console.log(response.data)
-                alert(response.data.message);
+                // alert(response.data.message);
                 dispatch(setUser(response.data.data.user));
                 dispatch(setLoginModal(false));
-                navigate(`/u/${response.data.data.user.username}`);
+                useToast({
+                    message: `Logged in as ${response?.data?.data?.user?.username}`,
+                    type: 'success',
+                    icon: <FaCheckCircle className='text-green-400 text-lg' />,
+                })
+                navigate(`/u/${response?.data?.data?.user?.username}`);
             } else {
-                alert("An error occurred while submitting the form");
+                // alert("An error occurred while submitting the form");
+                useToast({
+                    message: "No Credentials Found",
+                    type: 'error',
+                    icon: <MdError className='text-red-400 text-xl' />,
+                })
             }
         }
         catch (err) {
             console.log(err);
+            useToast({
+                message: "Incorrect Credentials",
+                type: 'error',
+                icon: <MdError className='text-red-400 text-xl' />,
+            })
         }
     };
 

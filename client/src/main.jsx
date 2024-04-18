@@ -6,7 +6,7 @@ import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store/store.js';
-
+import { Toaster } from 'react-hot-toast';
 // layout
 import RootLayout from './layouts/RootLayout.jsx'
 
@@ -103,6 +103,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
     <Provider store={store}>
       <RouterProvider router={router} />
+      <Toaster />
     </Provider>
 
   </React.StrictMode>,
