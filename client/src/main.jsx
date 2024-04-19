@@ -14,6 +14,7 @@ import RootLayout from './layouts/RootLayout.jsx'
 import Home from './pages/Home.jsx'
 import CreateStash from './pages/CreateStash.jsx'
 import Profile from './pages/Profile.jsx';
+import CreateCollection from './pages/CreateCollection.jsx';
 
 import { Outlet } from 'react-router-dom';
 
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
           {
             path: "public",
             element: <div>Public Collections Page</div>,
+          },
+          {
+            path: "create-collection",
+            element: <CreateCollection />,
           }
         ],
       },
