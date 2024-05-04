@@ -19,6 +19,10 @@ const userSchema = new Schema(
         refreshToken: {
             type: String,
         },
+        avatar: {
+            type: String, // cloudinary url
+            default: "",
+        },
 
     },
     { timestamps: true }

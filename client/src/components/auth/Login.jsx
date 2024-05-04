@@ -42,6 +42,10 @@ export default function Login(
             if (response.data && response.data.message) {
                 // console.log(response.data)
                 // alert(response.data.message);
+                setFormData({
+                    loginusername: '',
+                    loginpassword: ''
+                });
                 dispatch(setUser(response.data.data.user));
                 dispatch(setLoginModal(false));
                 useToast({
@@ -71,7 +75,7 @@ export default function Login(
 
     return (
         <section className='w-full'>
-            <div className="flex items-center justify-center bg-[#293040] px-4 sm:px-6 lg:px-8 py-8 rounded-xl text-white">
+            <div className="flex items-center justify-center bg-[#293040] px-4 sm:px-6 lg:px-8 py-4 rounded-xl text-white">
                 <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
                     <div className="mb-2 flex justify-center">
                         <img src={logo} alt="logo" className="w-16 h-16" />
@@ -80,23 +84,23 @@ export default function Login(
                         Sign in to your account
                     </h2>
                     <form
-                        className="mt-8"
+                        className="mt-4"
                         onSubmit={handleSubmit}
                     >
-                        <div className="space-y-5">
+                        <div className="space-y-3">
                             <div>
                                 <label htmlFor="loginusername" className="text-base font-medium text-gray-200">
                                     {' '}
                                     Username{' '}
                                 </label>
-                                <div className="mt-2">
+                                <div className="mt-1">
                                     <input
                                         id='loginusername'
                                         name='loginusername'
                                         className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                                         type="text"
                                         placeholder="Enter your username"
-                                        value={formData.username}
+                                        value={formData.loginusername}
                                         onChange={handleChange}
                                     ></input>
                                 </div>
@@ -108,14 +112,14 @@ export default function Login(
                                         Password{' '}
                                     </label>
                                 </div>
-                                <div className="mt-2">
+                                <div className="mt-1">
                                     <input
                                         id='loginpassword'
                                         name='loginpassword'
                                         className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                                         type="password"
                                         placeholder="Enter your password"
-                                        value={formData.password}
+                                        value={formData.loginpassword}
                                         onChange={handleChange}
                                     ></input>
                                 </div>
@@ -130,12 +134,12 @@ export default function Login(
                                 </button>
                             </div>
                         </div>
-                        <p className="mt-2 text-center text-sm text-gray-300 ">
+                        <p className="mt-2 text-center text-base text-gray-300">
                             Don&apos;t have an account?{' '}
                             <button
                                 onClick={onSwitch}
                                 title=""
-                                className="font-semibold  transition-all duration-200 hover:underline"
+                                className="font-semibold transition-all duration-200 hover:underline"
                             >
                                 Create a free account
                             </button>

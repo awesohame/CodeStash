@@ -3,6 +3,7 @@ import { User } from '../models/user.model.js';
 import { ApiError } from '../utils/apiError.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import jwt from 'jsonwebtoken';
+import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import mongoose from 'mongoose';
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -32,6 +33,18 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
+
+    let avatarUrl = "";
+    if (avatarLocalPath) {
+        const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+        if (!avatar) {
+            throw new ApiError(500, "Failed to upload avatar");
+        }
+        avatarUrl = avatar?.url || "";
+    }
+
     const existingUser = await User.findOne({
         username,
     });
@@ -43,6 +56,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
         username: username.toLowerCase(),
         password,
+        avatar: avatarUrl,
     });
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);

@@ -1,5 +1,5 @@
 import logo from '../../assets/logo.png'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
@@ -18,27 +18,61 @@ export default function Register({
     const [formData, setFormData] = useState({
         username: '',
         email: '',
-        password: ''
+        password: '',
+        avatar: null,
+        imagePreview: null
     });
+
+    const inputRef = useRef(null);
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+
+    const handleImageChange = (e) => {
+        const imageFile = e.target.files[0];
+        setFormData({
+            ...formData,
+            avatar: imageFile,
+            imagePreview: URL.createObjectURL(imageFile),
+        });
+
+        inputRef.current = e.target;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // console.log(formData);
+
+        console.log(formData.avatar);
         try {
             const response = await axios.post(
                 '/api/v1/users/register',
                 {
                     username: formData.registerusername,
                     password: formData.registerpassword,
-                    email: formData.registeremail
+                    email: formData.registeremail,
+                    avatar: formData.avatar
+                },
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
                 }
             );
 
             if (response.data && response.data.message) {
                 // console.log(response.data)
                 // alert(response.data.message);
+                if (inputRef.current) {
+                    inputRef.current.value = '';
+                }
+                setFormData({
+                    registerusername: '',
+                    registeremail: '',
+                    registerpassword: '',
+                    avatar: null,
+                    imagePreview: null
+                });
                 dispatch(setUser(response.data.data.user));
                 dispatch(setRegisterModal(false));
                 useToast({
@@ -67,9 +101,9 @@ export default function Register({
     };
 
     return (
-        <section className='w-full rounded-[2rem]'>
-            <div className="flex items-center justify-center bg-[#293040] px-4 sm:px-6 lg:px-8 py-8 rounded-[2rem] text-white">
-                <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
+        <section className='w-[60vw] rounded-[2rem]'>
+            <div className="flex items-center justify-center bg-[#293040] px-4 sm:px-6 lg:px-8 py-4 rounded-[2rem] text-white">
+                <div className="xl:mx-auto xl:w-full xl:max-w-xl 2xl:max-w-xl">
                     <div className="mb-2 flex justify-center">
                         <img src={logo} alt="logo" className="w-16 h-16" />
                     </div>
@@ -79,15 +113,15 @@ export default function Register({
 
                     <form
                         onSubmit={handleSubmit}
-                        className="mt-8"
+                        className="mt-4 flex justify-between"
                     >
-                        <div className="space-y-5">
+                        <div className="space-y-3 w-[45%]">
                             <div>
                                 <label htmlFor="registerusername" className="text-base font-medium text-gray-200">
                                     {' '}
                                     Username{' '}
                                 </label>
-                                <div className="mt-2">
+                                <div className="mt-1">
                                     <input
                                         id='registerusername'
                                         name='registerusername'
@@ -95,6 +129,7 @@ export default function Register({
                                         type="text"
                                         placeholder="e.g. generic_user123"
                                         onChange={handleChange}
+                                        value={formData.registerusername}
                                     ></input>
                                 </div>
                             </div>
@@ -103,7 +138,7 @@ export default function Register({
                                     {' '}
                                     Email address{' '}
                                 </label>
-                                <div className="mt-2">
+                                <div className="mt-1">
                                     <input
                                         className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                                         type="email"
@@ -111,6 +146,7 @@ export default function Register({
                                         id="registeremail"
                                         name='registeremail'
                                         onChange={handleChange}
+                                        value={formData.registeremail}
                                     ></input>
                                 </div>
                             </div>
@@ -121,7 +157,7 @@ export default function Register({
                                         Password{' '}
                                     </label>
                                 </div>
-                                <div className="mt-2">
+                                <div className="mt-1">
                                     <input
                                         className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                                         type="password"
@@ -129,6 +165,7 @@ export default function Register({
                                         id="registerpassword"
                                         name='registerpassword'
                                         onChange={handleChange}
+                                        value={formData.registerpassword}
                                     ></input>
                                 </div>
                             </div>
@@ -141,13 +178,47 @@ export default function Register({
                                 </button>
                             </div>
                         </div>
+                        <div>
+                            <div className="flex flex-col items-center mx-auto">
+                                <label htmlFor="productImage" className="block mb-1 text-white">
+                                    Avatar Image:
+                                </label>
+                                <input
+                                    type="file"
+                                    id="productImage"
+                                    name="productImage"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    className="w-full border border-gray-400 bg-gradient-to-r from-gray-900 to-black rounded"
+
+                                />
+
+                                {/* Display image preview */}
+                                {
+                                    formData.imagePreview ? (
+                                        <div className="mt-2 h-40 w-40 bg-gray-800 flex items-center justify-center">
+                                            <img
+                                                src={formData.imagePreview}
+                                                alt="Product Preview"
+                                                className="mt-2 max-h-40 mx-auto"
+                                            />
+                                        </div>
+                                    )
+                                        : (
+                                            <div className="mt-2 h-40 w-40 bg-gray-800 flex items-center justify-center">
+                                                <p className="text-gray-400 text-sm">Image Preview</p>
+                                            </div>
+                                        )
+                                }
+                            </div>
+                        </div>
                     </form>
 
                     <p className="mt-2 text-center text-base text-gray-300">
                         Already have an account?{' '}
                         <button
                             onClick={onSwitch}
-                            className="font-medium transition-all duration-200 hover:underline"
+                            className="font-semibold transition-all duration-200 hover:underline"
                         >
                             Sign In
                         </button>
