@@ -50,7 +50,7 @@ function Profile() {
             className='flex items-center justify-between w-full bg-[#202632] px-20 py-10'
             style={{ height: `calc(100vh - ${navbarHeight + 50}px)` }}
         >
-            <div className='bg-[#384157] rounded-lg w-[64%] h-full flex flex-col justify-between py-6 px-8'>
+            <div className='bg-[#384157] rounded-lg w-[64%] h-full flex flex-col justify-between py-4 px-8'>
                 <div className="w-full text-[#D5B263] text-2xl font-extrabold">
                     {
                         isLoggedUser
@@ -58,13 +58,13 @@ function Profile() {
                             : `${username}'s Stashes`
                     }
                 </div>
-                <div>
+                <div className="">
                     <OneLineStashCard
                         stashes={stashes}
                         className=""
                     />
                     {
-                        stashes.length !== 0 && stashes.length < 4 &&
+                        stashes.length !== 0 && stashes.length < 3 &&
                         <div className="text-[#D5B263] text-lg font-semibold text-center mt-4">
                             No more stashes to show
                         </div>
@@ -85,7 +85,7 @@ function Profile() {
                     />
                 </div>
             </div>
-            <div className="bg-[#384157] rounded-lg w-[32%] h-full flex flex-col justify-between py-6 px-8">
+            <div className="bg-[#384157] rounded-lg w-[32%] h-full flex flex-col justify-between py-4 px-8">
                 <div className="w-full text-[#D5B263] text-2xl font-extrabold">
                     {
                         isLoggedUser
